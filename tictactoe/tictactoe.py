@@ -22,13 +22,30 @@ def player(board):
     """
     Returns player who has the next turn on a board.
     """
-    raise NotImplementedError
-
+    count = 0
+    for i in range(3):
+        for j in range(3):
+            if board[i][j] == EMPTY:
+                count += 1
+    if board == initial_state:
+        return X
+    elif count % 2 == 0:
+        return X
+    else:
+        return O
 
 def actions(board):
     """
     Returns set of all possible actions (i, j) available on the board.
     """
+    legal_actions = set()
+    for i in range(3):
+        for j in range(3):
+            if board[i][j] == EMPTY:
+                legal_actions.add((i,j))
+    return legal_actions
+
+
     raise NotImplementedError
 
 
