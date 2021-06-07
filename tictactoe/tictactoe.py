@@ -45,10 +45,6 @@ def actions(board):
                 legal_actions.add((i,j))
     return legal_actions
 
-
-    raise NotImplementedError
-
-
 def result(board, action):
     """
     Returns the board that results from making move (i, j) on the board.
