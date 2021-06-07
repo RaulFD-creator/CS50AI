@@ -1,4 +1,5 @@
 import csv
+import os
 import sys
 
 from util import Node, StackFrontier, QueueFrontier
@@ -91,9 +92,43 @@ def shortest_path(source, target):
 
     If no possible path, returns None.
     """
+    starting_node = Node(state=source, parent=None, action=None)
+    frontier = StackFrontier()
+    frontier.add(starting_node)
 
-    # TODO
-    raise NotImplementedError
+    explored = set()
+    while True:
+        if frontier.empty():
+            return None
+    
+        # Select a person from the frontier
+        node = frontier.remove()
+                
+        # Load people who starred with that person somewhere
+        for movie, person in neighbors_for_person(node.state):
+            # If new person not in frontier and not in explored,
+            if not frontier.contains_state(person) and person not in explored:
+                # Define a child node define by the person and movie they starred in
+                child = Node(state=person, parent=node, action=movie)
+                    
+                # If the person is the target then travel through the child's
+                # predecersors till there are no more predecesors
+                # then sort them form oldest till the child, and return
+                # the list.
+                if child.state == target:
+                    path = []
+                    while child.parent is not None:
+                        path.append((child.action, child.state))
+                        child = child.parent
+                    path.reverse()
+                    return path
+
+                # If the person is not the target then add them to the frontier
+                # and add the person to the explored set.
+                else:
+                    frontier.add(child)
+
+        explored.add(node.state)
 
 
 def person_id_for_name(name):
