@@ -59,16 +59,73 @@ def load_data(filename):
     labels should be the corresponding list of labels, where each label
     is 1 if Revenue is true, and 0 otherwise.
     """
-    raise NotImplementedError
+    evidence = []
+    labels = []
 
+    with open(filename, 'r') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            evidence.append(
+                [
+                    int(row["Administrative"]),
+                    float(row["Administrative_Duration"]),
+                    int(row["Informational"]),
+                    float(row["Informational_Duration"]),
+                    int(row["ProductRelated"]),
+                    float(row["ProductRelated_Duration"]),
+                    float(row["BounceRates"]),
+                    float(row["ExitRates"]),
+                    float(row["PageValues"]),
+                    float(row["SpecialDay"]),
+                    month2num(row["Month"]),
+                    int(row["OperatingSystems"]),
+                    int(row["Browser"]),
+                    int(row["Region"]),
+                    int(row["TrafficType"]),
+                    1 if row["VisitorType"] == "Returning_Visitor" else 0,
+                    1 if row["Weekend"] == "TRUE" else 0
+                ]
+            )
+            labels.append(1 if row["Revenue"] == "TRUE" else 0)
+
+    return (evidence, labels)
+
+    
+def month2num(Month):
+    for _ in Month:
+        if Month == "Jan":
+            Month = 0
+        elif Month == "Feb":
+            Month = 1
+        elif Month == "Mar":
+            Month = 2
+        elif Month == "Apr":
+            Month = 3
+        elif Month == "May":
+            Month = 4
+        elif Month == "June":
+            Month = 5
+        elif Month == "Jul":
+            Month = 6
+        elif Month == "Aug":
+            Month = 7
+        elif Month == "Sep":
+            Month = 8
+        elif Month == "Oct":
+            Month = 9
+        elif Month == "Nov":
+            Month = 10
+        elif Month == "Dec":
+            Month = 11
+    return Month
 
 def train_model(evidence, labels):
     """
     Given a list of evidence lists and a list of labels, return a
     fitted k-nearest neighbor model (k=1) trained on the data.
     """
-    raise NotImplementedError
-
+    K = int(1)
+    return KNeighborsClassifier(n_neighbors=K).fit(evidence, labels)
 
 def evaluate(labels, predictions):
     """
@@ -85,7 +142,29 @@ def evaluate(labels, predictions):
     representing the "true negative rate": the proportion of
     actual negative labels that were accurately identified.
     """
-    raise NotImplementedError
+    sensitivity = float(0)
+    specificity = float(0)
+
+    total_negative = float(0)
+    total_positive = float(0)
+
+    accurate_negative = float(0)
+    accurate_positive = float(0)
+
+    for label, prediction in zip (labels, predictions):
+        if label == 0:
+            total_negative += 1
+            if label == prediction:
+                accurate_negative += 1
+        elif label == 1:
+            total_positive += 1
+            if label == prediction:
+                accurate_positive += 1
+    
+    sensitivity = accurate_positive / total_positive
+    specificity = accurate_negative / total_negative
+    
+    return (sensitivity, specificity)
 
 
 if __name__ == "__main__":
