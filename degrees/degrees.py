@@ -1,6 +1,10 @@
+
 import csv
-import os
 import sys
+import os
+
+
+direc=(os.getcwd())
 
 from util import Node, StackFrontier, QueueFrontier
 
@@ -19,7 +23,7 @@ def load_data(directory):
     Load data from CSV files into memory.
     """
     # Load people
-    with open(f"{directory}/people.csv", encoding="utf-8") as f:
+    with open(f"{directory}/people.csv") as f:
         reader = csv.DictReader(f)
         for row in reader:
             people[row["id"]] = {
@@ -33,7 +37,7 @@ def load_data(directory):
                 names[row["name"].lower()].add(row["id"])
 
     # Load movies
-    with open(f"{directory}/movies.csv", encoding="utf-8") as f:
+    with open(f"{directory}/movies.csv". format(direc,directory)) as f:
         reader = csv.DictReader(f)
         for row in reader:
             movies[row["id"]] = {
@@ -43,7 +47,7 @@ def load_data(directory):
             }
 
     # Load stars
-    with open(f"{directory}/stars.csv", encoding="utf-8") as f:
+    with open(f"{directory}/stars.csv") as f:
         reader = csv.DictReader(f)
         for row in reader:
             try:
@@ -57,7 +61,8 @@ def main():
     if len(sys.argv) > 2:
         sys.exit("Usage: python degrees.py [directory]")
     directory = sys.argv[1] if len(sys.argv) == 2 else "large"
-
+     
+  #  directory=input("Base de datos: ")
     # Load data from files into memory
     print("Loading data...")
     load_data(directory)
@@ -84,7 +89,6 @@ def main():
             movie = movies[path[i + 1][0]]["title"]
             print(f"{i + 1}: {person1} and {person2} starred in {movie}")
 
-
 def shortest_path(source, target):
     """
     Returns the shortest list of (movie_id, person_id) pairs
@@ -92,29 +96,32 @@ def shortest_path(source, target):
 
     If no possible path, returns None.
     """
-    starting_node = Node(state=source, parent=None, action=None)
-    frontier = StackFrontier()
-    frontier.add(starting_node)
+    # Initialize frontier to just the starting position
+    # Our states are people and our actions are movies, which take us from
+    # one actor to another.
+    start = Node(state=source, parent=None, action=None)
+    frontier = QueueFrontier()
+    frontier.add(start)
 
+    # Initialize an empty explored set
     explored = set()
+
+    # Keep looping until solution found
     while True:
+
+        # If nothing left in frontier, then no path
         if frontier.empty():
             return None
-    
-        # Select a person from the frontier
+
+        # Choose a node from the frontier
         node = frontier.remove()
-                
-        # Load people who starred with that person somewhere
-        for movie, person in neighbors_for_person(node.state):
-            # If new person not in frontier and not in explored,
-            if not frontier.contains_state(person) and person not in explored:
-                # Define a child node define by the person and movie they starred in
-                child = Node(state=person, parent=node, action=movie)
-                    
-                # If the person is the target then travel through the child's
-                # predecersors till there are no more predecesors
-                # then sort them form oldest till the child, and return
-                # the list.
+
+        # Add neighbors to frontier
+        for action, state in neighbors_for_person(node.state):
+            if not frontier.contains_state(state) and state not in explored:
+                child = Node(state=state, parent=node, action=action)
+
+                # If node is the goal, then we have a solution
                 if child.state == target:
                     path = []
                     while child.parent is not None:
@@ -122,13 +129,13 @@ def shortest_path(source, target):
                         child = child.parent
                     path.reverse()
                     return path
-
-                # If the person is not the target then add them to the frontier
-                # and add the person to the explored set.
                 else:
                     frontier.add(child)
 
+        # Mark node as explored
         explored.add(node.state)
+    # TODO
+#    raise NotImplementedError
 
 
 def person_id_for_name(name):

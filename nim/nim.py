@@ -121,7 +121,9 @@ class NimAI():
         `alpha` is the learning rate, and `new value estimate`
         is the sum of the current reward and estimated future rewards.
         """
+
         self.q[tuple(state), action] = old_q + self.alpha * ((reward + future_rewards) - old_q)
+ 
 
     def best_future_reward(self, state):
         """
@@ -137,9 +139,9 @@ class NimAI():
 
         for available_action in Nim.available_actions(state):
             if self.get_q_value(state, available_action) > best_reward:
-                best_reward = self.get_q_value(tuple(state), available_action)
-        return best_reward
+                best_reward = self.get_q_value(state, available_action)
 
+        return best_reward
 
     def choose_action(self, state, epsilon=True):
         """

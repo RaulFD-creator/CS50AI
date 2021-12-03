@@ -1,4 +1,4 @@
-import cv2 
+import cv2
 import numpy as np
 import os
 import sys
@@ -58,8 +58,8 @@ def load_data(data_dir):
     be a list of integer labels, representing the categories for each of the
     corresponding `images`.
     """
-    images = []
-    labels = []
+    images = list()
+    labels = list()
 
     for folder in os.listdir(data_dir):
         folder_path = os.path.join(data_dir, folder)
@@ -72,9 +72,8 @@ def load_data(data_dir):
                     images.append(image)
                     labels.append(int(folder))
                 except Exception as e:
-                    print(f"File {element} cannot be properly read")
+                    print(f"There is a problem with file: {element}")
                     print(str(e))
-
     return images, labels
 
 def get_model():
@@ -82,9 +81,6 @@ def get_model():
     Returns a compiled convolutional neural network model. Assume that the
     `input_shape` of the first layer is `(IMG_WIDTH, IMG_HEIGHT, 3)`.
     The output layer should have `NUM_CATEGORIES` units, one for each category.
-    """
-    """
-    Neural network
     """
   # Create a convolutional neural network
     model = tf.keras.models.Sequential([
